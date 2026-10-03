@@ -96,6 +96,15 @@ export interface DealRestaurantSummary {
   logoUrl: string;
   areaName: string;
   distanceM?: number;
+  address?: string;
+  location?: { lat: number; lng: number };
+  phone?: string;
+  whatsapp?: string;
+  website?: string;
+  orderingUrl?: string;
+  openingHours?: OpeningHours;
+  rating?: number;
+  reviewCount?: number;
 }
 
 export interface DealSummary {

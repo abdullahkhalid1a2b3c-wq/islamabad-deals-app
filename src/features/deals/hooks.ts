@@ -87,7 +87,12 @@ export function useDealDetail(id: string) {
     queryKey: ['deals', 'detail', id],
     queryFn: () => dealsService.getDealById(id),
     enabled: !!id,
+    staleTime: 2 * 60 * 1000,
   });
+}
+
+export function useDeal(id: string) {
+  return useDealDetail(id);
 }
 
 export function useCategories() {

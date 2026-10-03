@@ -118,16 +118,34 @@ export const supabaseDealsService: DealsService = {
   },
 
   async getDealById(id: string): Promise<Deal | null> {
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!id || !UUID_REGEX.test(id)) {
+      return null;
+    }
+
     try {
       const { data, error } = await supabase
         .from('deals')
         .select(
           `
           *,
-          restaurant:restaurants(id, name, logo_url, area:areas(name))
+          restaurant:restaurants(
+            id,
+            name,
+            logo_url,
+            address,
+            phone,
+            whatsapp,
+            ordering_url,
+            opening_hours,
+            rating_avg,
+            review_count,
+            area:areas(name)
+          )
         `,
         )
         .eq('id', id)
+        .eq('status', 'active')
         .single();
 
       if (error || !data) return null;
@@ -148,6 +166,7 @@ export const supabaseDealsService: DealsService = {
         endDate: data.ends_at,
         dailyStartTime: data.daily_start_time || undefined,
         dailyEndTime: data.daily_end_time || undefined,
+        daysOfWeek: data.days_of_week || undefined,
         isFeatured: data.is_featured,
         isExclusive: data.is_exclusive,
         termsAndConditions: data.terms || [],
@@ -161,6 +180,14 @@ export const supabaseDealsService: DealsService = {
           logoUrl:
             restObj?.logo_url || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200',
           areaName: restObj?.area?.name || 'Islamabad',
+          address: restObj?.address || undefined,
+          location: { lat: 33.7294, lng: 73.0747 },
+          phone: restObj?.phone || undefined,
+          whatsapp: restObj?.whatsapp || undefined,
+          orderingUrl: restObj?.ordering_url || undefined,
+          openingHours: restObj?.opening_hours || undefined,
+          rating: Number(restObj?.rating_avg) || 0,
+          reviewCount: restObj?.review_count || 0,
         },
       };
 
@@ -170,3 +197,24 @@ export const supabaseDealsService: DealsService = {
     }
   },
 };
+
+/**
+ * Fire-and-forget analytics event logger.
+ * Failures are silently logged to console and never shown to the user.
+ */
+export function logDealEvent(dealId: string, event: string): void {
+  if (!dealId || !event) return;
+  supabase
+    .rpc('log_deal_event', {
+      p_deal_id: dealId,
+      p_event: event,
+    })
+    .then(({ error }) => {
+      if (error) {
+        console.warn(`[logDealEvent] Failed to log event "${event}" for deal ${dealId}:`, error.message);
+      }
+    })
+    .catch((err) => {
+      console.warn(`[logDealEvent] Unexpected error logging event "${event}":`, err);
+    });
+}

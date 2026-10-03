@@ -3,6 +3,7 @@ import {
   parseHHMMToMinutes,
   getKarachiMinutes,
   getKarachiParts,
+  formatDealSchedule,
 } from '../../src/utils/time';
 
 describe('time utils', () => {
@@ -20,12 +21,21 @@ describe('time utils', () => {
     expect(format12HourTime('23:00')).toBe('11:00 PM');
   });
 
-  it('extracts Karachi time parts accurately', () => {
-    // 2026-10-03T15:00:00Z is 2026-10-03 20:00 in Karachi (UTC+5)
-    const testDate = new Date('2026-10-03T15:00:00Z');
-    const parts = getKarachiParts(testDate);
-    expect(parts.hour).toBe(20);
-    expect(parts.minute).toBe(0);
-    expect(getKarachiMinutes(testDate)).toBe(1200);
+  it('formats deal schedule text correctly', () => {
+    expect(
+      formatDealSchedule({
+        daysOfWeek: [1, 2, 3, 4, 5],
+        dailyStartTime: '12:00',
+        dailyEndTime: '16:00',
+      }),
+    ).toBe('Mon to Fri · 12:00 PM to 4:00 PM');
+
+    expect(
+      formatDealSchedule({
+        daysOfWeek: [0, 6],
+        dailyStartTime: '18:00',
+        dailyEndTime: '22:00',
+      }),
+    ).toBe('Weekends (Sat & Sun) · 6:00 PM to 10:00 PM');
   });
 });

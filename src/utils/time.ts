@@ -81,3 +81,40 @@ export function format12HourTime(hhmm: string): string {
 
   return `${hours12}:${minsFormatted} ${period}`;
 }
+
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+/**
+ * Formats deal schedule days and daily time window into human-readable string.
+ * e.g. [1,2,3,4,5] with 12:00 and 16:00 -> "Mon to Fri · 12:00 PM to 4:00 PM"
+ */
+export function formatDealSchedule(deal: {
+  daysOfWeek?: number[] | null;
+  dailyStartTime?: string | null;
+  dailyEndTime?: string | null;
+}): string | null {
+  const { daysOfWeek, dailyStartTime, dailyEndTime } = deal;
+
+  let daysText = '';
+  if (daysOfWeek && daysOfWeek.length > 0) {
+    if (daysOfWeek.length === 7) {
+      daysText = 'All week';
+    } else if (daysOfWeek.length === 5 && daysOfWeek.every((d, i) => d === i + 1)) {
+      daysText = 'Mon to Fri';
+    } else if (daysOfWeek.length === 2 && daysOfWeek.includes(0) && daysOfWeek.includes(6)) {
+      daysText = 'Weekends (Sat & Sun)';
+    } else {
+      daysText = daysOfWeek.map((d) => DAY_NAMES[d] || '').filter(Boolean).join(', ');
+    }
+  }
+
+  let timeText = '';
+  if (dailyStartTime && dailyEndTime) {
+    timeText = `${format12HourTime(dailyStartTime)} to ${format12HourTime(dailyEndTime)}`;
+  }
+
+  if (daysText && timeText) {
+    return `${daysText} · ${timeText}`;
+  }
+  return daysText || timeText || null;
+}
