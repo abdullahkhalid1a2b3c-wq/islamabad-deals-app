@@ -6,8 +6,12 @@ export const envSchema = z.object({
   EXPO_PUBLIC_USE_MOCKS: z
     .string()
     .optional()
-    .transform((val) => val === undefined || val === 'true' || val === '1'),
+    .transform((val) => val === 'true' || val === '1'),
   EXPO_PUBLIC_DEBUG_ERRORS: z
+    .string()
+    .optional()
+    .transform((val) => val === 'true' || val === '1'),
+  EXPO_PUBLIC_ENABLE_GOOGLE_AUTH: z
     .string()
     .optional()
     .transform((val) => val === 'true' || val === '1'),
@@ -21,6 +25,7 @@ export function parseEnv(rawEnv: Record<string, string | undefined> = process.en
     EXPO_PUBLIC_SUPABASE_ANON_KEY: rawEnv.EXPO_PUBLIC_SUPABASE_ANON_KEY,
     EXPO_PUBLIC_USE_MOCKS: rawEnv.EXPO_PUBLIC_USE_MOCKS,
     EXPO_PUBLIC_DEBUG_ERRORS: rawEnv.EXPO_PUBLIC_DEBUG_ERRORS,
+    EXPO_PUBLIC_ENABLE_GOOGLE_AUTH: rawEnv.EXPO_PUBLIC_ENABLE_GOOGLE_AUTH,
   });
 
   if (!result.success) {

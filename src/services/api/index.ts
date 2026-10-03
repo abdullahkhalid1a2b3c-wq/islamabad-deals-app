@@ -4,16 +4,21 @@ import { mockDealsService } from '../mock/mockDealsService';
 import { mockRestaurantsService } from '../mock/mockRestaurantsService';
 import { mockCategoriesService } from '../mock/mockCategoriesService';
 import { mockAreasService } from '../mock/mockAreasService';
+import { supabaseDealsService } from '../supabase/supabaseDealsService';
+import { supabaseRestaurantsService } from '../supabase/supabaseRestaurantsService';
+import { supabaseCategoriesService } from '../supabase/supabaseCategoriesService';
+import { supabaseAreasService } from '../supabase/supabaseAreasService';
 
-const useMocks = env.EXPO_PUBLIC_USE_MOCKS ?? true;
+// Default to real Supabase services unless EXPO_PUBLIC_USE_MOCKS is explicitly true
+const useMocks = env.EXPO_PUBLIC_USE_MOCKS === true;
 
-export const dealsService: DealsService = useMocks ? mockDealsService : mockDealsService;
+export const dealsService: DealsService = useMocks ? mockDealsService : supabaseDealsService;
 export const restaurantsService: RestaurantsService = useMocks
   ? mockRestaurantsService
-  : mockRestaurantsService;
+  : supabaseRestaurantsService;
 export const categoriesService: CategoriesService = useMocks
   ? mockCategoriesService
-  : mockCategoriesService;
-export const areasService: AreasService = useMocks ? mockAreasService : mockAreasService;
+  : supabaseCategoriesService;
+export const areasService: AreasService = useMocks ? mockAreasService : supabaseAreasService;
 
 export * from './types';
