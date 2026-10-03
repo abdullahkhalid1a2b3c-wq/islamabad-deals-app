@@ -20,5 +20,10 @@ export function useRestaurantDetail(id: string) {
     queryKey: ['restaurants', 'detail', id],
     queryFn: () => restaurantsService.getRestaurantById(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
   });
+}
+
+export function useRestaurant(id: string) {
+  return useRestaurantDetail(id);
 }

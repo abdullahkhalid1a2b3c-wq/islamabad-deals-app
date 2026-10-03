@@ -81,6 +81,13 @@ export interface Restaurant extends RestaurantSummary {
   phone: string;
   serviceModes: ServiceMode[];
   menuSections?: MenuSection[];
+  images?: string[];
+  activeDeals?: DealSummary[];
+  website?: string;
+  instagram?: string;
+  whatsapp?: string;
+  description?: string;
+  features?: string[];
 }
 
 export interface DealRestaurantSummary {
