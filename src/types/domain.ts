@@ -21,6 +21,8 @@ export interface Area {
   name: string;
   city: string;
   slug: string;
+  lat?: number;
+  lng?: number;
 }
 
 export interface Category {
