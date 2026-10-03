@@ -8,13 +8,16 @@ export interface CategoryChipsProps {
   categories: Category[];
   selectedSlug?: string | null;
   onSelectCategory?: (slug: string | null) => void;
+  onSelect?: (slug: string | null) => void;
 }
 
 export const CategoryChips: React.FC<CategoryChipsProps> = ({
   categories,
   selectedSlug = null,
   onSelectCategory,
+  onSelect,
 }) => {
+  const handleSelect = onSelect || onSelectCategory;
   const allCategories: Array<{ id: string; name: string; slug: string | null }> = [
     { id: 'all', name: 'All Deals', slug: null },
     ...categories,
@@ -34,7 +37,7 @@ export const CategoryChips: React.FC<CategoryChipsProps> = ({
             <Chip
               label={item.name}
               selected={isSelected}
-              onPress={() => onSelectCategory?.(item.slug)}
+              onPress={() => handleSelect?.(item.slug)}
             />
           );
         }}

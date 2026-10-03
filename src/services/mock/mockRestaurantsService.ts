@@ -1,4 +1,4 @@
-import { RestaurantsService } from '../api/types';
+import { RestaurantsService, ListRestaurantsParams, ListRestaurantsResult } from '../api/types';
 import { Restaurant, RestaurantSummary } from '../../types/domain';
 import { MOCK_RESTAURANTS } from './mockData';
 import { env } from '../../lib/env';
@@ -34,6 +34,22 @@ export const mockRestaurantsService: RestaurantsService = {
         r.cuisine.some((c) => c.toLowerCase().includes(q)),
     );
     return simulateLatency(filtered);
+  },
+
+  async listRestaurants(params: ListRestaurantsParams): Promise<ListRestaurantsResult> {
+    let list = [...MOCK_RESTAURANTS];
+    if (params.categorySlug && params.categorySlug !== 'all') {
+      const slug = params.categorySlug.toLowerCase();
+      list = list.filter((r) => r.cuisine.some((c) => c.toLowerCase().includes(slug)));
+    }
+    if (params.priceRange) {
+      list = list.filter((r) => r.priceRange === params.priceRange);
+    }
+    const limit = params.limit || 15;
+    const offset = params.offset || 0;
+    const sliced = list.slice(offset, offset + limit);
+    const nextOffset = offset + limit < list.length ? offset + limit : null;
+    return simulateLatency({ items: sliced, nextOffset });
   },
 
   async getRestaurantById(id: string): Promise<Restaurant | null> {

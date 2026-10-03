@@ -1,4 +1,4 @@
-import { RestaurantsService } from '../api/types';
+import { RestaurantsService, ListRestaurantsParams, ListRestaurantsResult } from '../api/types';
 import { Restaurant, RestaurantSummary } from '../../types/domain';
 import { supabase } from '../../lib/supabase';
 import { toAppError } from '../../lib/errors';
@@ -17,6 +17,8 @@ function mapRPCRestaurantToSummary(row: any): RestaurantSummary {
     priceRange: row.price_range || 2,
     distanceM: row.distance_m ? Number(row.distance_m) : undefined,
     openingHours: row.opening_hours || {},
+    bestDeal: row.best_deal || null,
+    activeDealCount: row.active_deal_count || 0,
   };
 }
 
@@ -43,6 +45,38 @@ export const supabaseRestaurantsService: RestaurantsService = {
 
       if (error) throw error;
       return (data || []).map(mapRPCRestaurantToSummary);
+    } catch (err) {
+      throw toAppError(err);
+    }
+  },
+
+  async listRestaurants(params: ListRestaurantsParams): Promise<ListRestaurantsResult> {
+    try {
+      const limit = params.limit || 15;
+      const offset = params.offset || 0;
+
+      const { data, error } = await supabase.rpc('search_restaurants', {
+        p_lat: params.coords?.lat,
+        p_lng: params.coords?.lng,
+        p_category_slug: params.categorySlug || undefined,
+        p_area_id: params.areaId || undefined,
+        p_price_range: params.priceRange || undefined,
+        p_open_now: params.openNow || false,
+        p_sort: params.sort || 'popular',
+        p_search_query: params.searchQuery || undefined,
+        p_limit: limit,
+        p_offset: offset,
+      });
+
+      if (error) throw error;
+
+      const items = (data || []).map(mapRPCRestaurantToSummary);
+      const nextOffset = items.length >= limit ? offset + limit : null;
+
+      return {
+        items,
+        nextOffset,
+      };
     } catch (err) {
       throw toAppError(err);
     }

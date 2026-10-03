@@ -24,9 +24,27 @@ export interface DealsService {
   getDealById(id: string): Promise<Deal | null>;
 }
 
+export interface ListRestaurantsParams {
+  coords?: { lat: number; lng: number };
+  categorySlug?: string | null;
+  areaId?: string | null;
+  priceRange?: number | null;
+  openNow?: boolean;
+  sort?: string;
+  searchQuery?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ListRestaurantsResult {
+  items: RestaurantSummary[];
+  nextOffset: number | null;
+}
+
 export interface RestaurantsService {
   getPopularRestaurants(): Promise<RestaurantSummary[]>;
   getRestaurants(searchQuery?: string): Promise<RestaurantSummary[]>;
+  listRestaurants(params: ListRestaurantsParams): Promise<ListRestaurantsResult>;
   getRestaurantById(id: string): Promise<Restaurant | null>;
 }
 

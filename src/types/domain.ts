@@ -47,6 +47,15 @@ export interface MenuSection {
   items: MenuItem[];
 }
 
+export interface BestDealSummary {
+  id: string;
+  title: string;
+  discountPercent?: number;
+  originalPricePKR?: number;
+  dealPricePKR?: number;
+  dealType?: string;
+}
+
 export interface RestaurantSummary {
   id: string;
   name: string;
@@ -59,6 +68,8 @@ export interface RestaurantSummary {
   priceRange: PriceRange;
   distanceM?: number;
   openingHours: OpeningHours;
+  bestDeal?: BestDealSummary | null;
+  activeDealCount?: number;
 }
 
 export interface Restaurant extends RestaurantSummary {

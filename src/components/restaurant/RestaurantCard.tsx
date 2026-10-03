@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { RestaurantSummary } from '../../types/domain';
+import { RestaurantSummary, BestDealSummary } from '../../types/domain';
 import { Card } from '../ui/Card';
 import { Text } from '../ui/Text';
 import { Rating } from '../ui/Rating';
 import { Badge } from '../ui/Badge';
 import { Avatar } from '../ui/Avatar';
+import { BestDealStrip } from './BestDealStrip';
 import { getOpenStatus } from '../../utils/openingHours';
 import { formatDistance } from '../../utils/distance';
 import { theme } from '../../theme';
@@ -16,6 +17,7 @@ export type RestaurantCardVariant = 'compact' | 'row';
 export interface RestaurantCardProps {
   restaurant: RestaurantSummary;
   variant?: RestaurantCardVariant;
+  bestDeal?: BestDealSummary | null;
   onPress?: () => void;
 }
 
@@ -24,15 +26,17 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export const RestaurantCard: React.FC<RestaurantCardProps> = ({
   restaurant,
   variant = 'compact',
+  bestDeal,
   onPress,
 }) => {
   const [coverErr, setCoverErr] = useState(false);
   const fallbackCover =
     'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&auto=format&fit=crop&q=80';
 
-  const { isOpen, label: openStatusLabel } = getOpenStatus(restaurant.openingHours);
+  const { isOpen } = getOpenStatus(restaurant.openingHours);
   const priceRangeStr = '$'.repeat(restaurant.priceRange || 2);
   const cuisineStr = restaurant.cuisine ? restaurant.cuisine.slice(0, 2).join(' • ') : '';
+  const activeBestDeal = bestDeal !== undefined ? bestDeal : restaurant.bestDeal;
 
   if (variant === 'row') {
     return (
@@ -87,6 +91,13 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({
               </Text>
             ) : null}
           </View>
+
+          {activeBestDeal ? (
+            <BestDealStrip
+              bestDeal={activeBestDeal}
+              activeDealCount={restaurant.activeDealCount}
+            />
+          ) : null}
         </View>
       </Card>
     );
@@ -132,6 +143,13 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({
             {restaurant.distanceM ? `• ${formatDistance(restaurant.distanceM)}` : ''}
           </Text>
         </View>
+
+        {activeBestDeal ? (
+          <BestDealStrip
+            bestDeal={activeBestDeal}
+            activeDealCount={restaurant.activeDealCount}
+          />
+        ) : null}
       </View>
     </Card>
   );
